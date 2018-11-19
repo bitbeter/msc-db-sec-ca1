@@ -31,5 +31,4 @@ if __name__ == '__main__':
         print(HELP_MESSAGE)
     else:
         if '-si' in flags:
-            # yORn = raw_input("Do you sure to publishing version %s: (y/n)  " % (NEW_VERSION))
-            print 'shell'
+            print 'shell is running'
