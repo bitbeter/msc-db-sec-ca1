@@ -5,11 +5,12 @@ create table doctor
     lastname text not null,
     national_code int not null,
     sexual text not null,
-    birthday int not null,
+    birthday date not null,
     major text not null,
     maried boolean not null,
     eployee_id text unique,
     employment_date date,
+    access_level int,
     section text,
     salary int
 );
@@ -20,10 +21,12 @@ create table nurse
     lastname text not null,
     national_code int not null,
     sexual text not null,
-    birthday int not null,
+    birthday date not null,
     maried boolean not null,
     eployee_id text unique,
     employment_date date,
+    access_level int,
+    section text,
     salary int
 );
 
@@ -34,12 +37,13 @@ create table employee
     lastname text not null,
     national_code int not null,
     sexual text not null,
-    birthday int not null,
+    birthday date not null,
     major text not null,
     maried boolean not null,
     work text,
     eployee_id text unique,
     employment_date date,
+    access_level int,
     section text,
     salary int
 );
@@ -51,7 +55,7 @@ create table patient
     lastname text not null,
     national_code int not null,
     sexual text not null,
-    birthday int not null,
+    birthday date not null,
     maried boolean not null,
     patient_type text,
     drugs text,
