@@ -10,9 +10,11 @@ create table doctor
     maried boolean not null,
     eployee_id text unique,
     employment_date date,
-    access_level int,
     section text,
-    salary int
+    salary int,
+    absolute_security_level int,
+    read_security_level int,
+    write_security_level int
 );
 create table nurse
 (
@@ -27,7 +29,10 @@ create table nurse
     employment_date date,
     access_level int,
     section text,
-    salary int
+    salary int,
+    absolute_security_level int,
+    read_security_level int,
+    write_security_level int
 );
 
 create table employee
@@ -45,7 +50,10 @@ create table employee
     employment_date date,
     access_level int,
     section text,
-    salary int
+    salary int,
+    absolute_security_level int,
+    read_security_level int,
+    write_security_level int
 );
 
 create table patient
@@ -61,5 +69,8 @@ create table patient
     drugs text,
     section text,
     doctor_id int references doctor(id),
-    nurse_id int references nurse(id)
+    nurse_id int references nurse(id),
+    absolute_security_level int,
+    read_security_level int,
+    write_security_level int
 );
