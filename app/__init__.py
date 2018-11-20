@@ -1,2 +1,2 @@
-from session import Session
-from shell import shell
+from app.session import Session
+from app.shell import shell
