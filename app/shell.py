@@ -48,7 +48,7 @@ def shell(yes_to_all=False):
             '> ', completer=SHELL_COMPLETER, auto_suggest=AutoSuggestFromHistory()).lower()
         if command == '-h':
             print(HELP_MESSAGE)
-        elif command == 'exit' and do_you_sure(yse_to_all):
+        elif command == 'exit' and do_you_sure(yes_to_all):
             sys.exit()
         elif command == 'my privacy':
             # @todo needs to implement by query
