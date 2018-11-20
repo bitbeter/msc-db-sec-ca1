@@ -1,0 +1,6 @@
+{
+    "files.exclude": {
+        "**/*.pyc": true
+    },
+    "python.pythonPath": "/Library/Frameworks/Python.framework/Versions/3.4/bin/python3"
+}
