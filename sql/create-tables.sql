@@ -1,9 +1,20 @@
-create table auth
+create table person
 (
     -- Primary Key
     username text primary key not null,
     -- Fields
     password text not null,
+    firstname text not null,
+    lastname text not null,
+    national_code text not null,
+    sexual text not null,
+    birthday date not null,
+    maried boolean not null,
+    section text not null,
+    type text not null,
+    employee_id text unique,
+    employment_date date,
+    salary int,
     -- Security Levels
     absolute_security_level int,
     read_security_level int,
@@ -16,81 +27,40 @@ create table auth
 create table doctor
 (
     -- Primary Key
-    id int primary key not null,
+    id SERIAL primary key not null,
     -- Fields
-    firstname text not null,
-    lastname text not null,
-    national_code int not null,
-    sexual text not null,
-    birthday date not null,
     major text not null,
-    maried boolean not null,
-    eployee_id text unique,
-    employment_date date,
-    section text,
-    salary int,
     -- Forigen Keys
-    username text references auth(username) on update cascade on delete cascade
+    username text references person(username) on update cascade on delete cascade
 );
 
 create table nurse
 (
     -- Primary Key
-    id int primary key not null,
-    -- Fields
-    firstname text not null,
-    lastname text not null,
-    national_code int not null,
-    sexual text not null,
-    birthday date not null,
-    maried boolean not null,
-    eployee_id text unique,
-    employment_date date,
-    access_level int,
-    section text,
-    salary int,
+    id SERIAL primary key not null,
     -- Forigen Keys
-    username text references auth(username) on update cascade on delete cascade
+    username text references person(username) on update cascade on delete cascade
 );
 
 create table employee
 (
     -- Primary Key
-    id int primary key not null,
+    id SERIAL primary key not null,
     -- Fields
-    firstname text not null,
-    lastname text not null,
-    national_code int not null,
-    sexual text not null,
-    birthday date not null,
-    major text not null,
-    maried boolean not null,
-    work text,
-    eployee_id text unique,
-    employment_date date,
-    access_level int,
-    section text,
-    salary int,
+    carrer text,
     -- Forigen Keys
-    username text references auth(username) on update cascade on delete cascade
+    username text references person(username) on update cascade on delete cascade
 );
 
 create table patient
 (
     -- Primary Key
-    id int primary key not null,
+    id SERIAL primary key not null,
     -- Fields
-    firstname text not null,
-    lastname text not null,
-    national_code int not null,
-    sexual text not null,
-    birthday date not null,
-    maried boolean not null,
     patient_type text,
     drugs text,
-    section text,
     -- Forigen Keys
-    username text references auth(username) on update cascade on delete cascade,
-    doctor_id int references doctor(id),
-    nurse_id int references nurse(id)
+    username text references person(username) on update cascade on delete cascade,
+    doctor_username text references person(username),
+    nurse_username text references person(username)
 );
