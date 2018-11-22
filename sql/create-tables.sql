@@ -7,7 +7,7 @@ create table auth
     -- Security Levels
     absolute_security_level int,
     read_security_level int,
-    write_security_level int
+    write_security_level int,
     absolute_integrity_level int,
     read_integrity_level int,
     write_integrity_level int
@@ -30,7 +30,7 @@ create table doctor
     section text,
     salary int,
     -- Forigen Keys
-    username text references auth(username)
+    username text references auth(username) on update cascade on delete cascade
 );
 
 create table nurse
@@ -50,7 +50,7 @@ create table nurse
     section text,
     salary int,
     -- Forigen Keys
-    username text references auth(username)
+    username text references auth(username) on update cascade on delete cascade
 );
 
 create table employee
@@ -72,7 +72,7 @@ create table employee
     section text,
     salary int,
     -- Forigen Keys
-    username text references auth(username)
+    username text references auth(username) on update cascade on delete cascade
 );
 
 create table patient
@@ -90,7 +90,7 @@ create table patient
     drugs text,
     section text,
     -- Forigen Keys
-    username text references auth(username),
+    username text references auth(username) on update cascade on delete cascade,
     doctor_id int references doctor(id),
     nurse_id int references nurse(id)
 );

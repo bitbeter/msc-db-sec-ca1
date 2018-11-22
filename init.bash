@@ -1,6 +1,6 @@
 #!/bin/bash
 
-echo "[INIT] Building Database"
+echo "[INIT] Rebuilding Database"
 # Rebuild Database
 psql -h localhost -U postgres -f ./sql/rebuild-database.sql
 echo "[INIT] Databse with name dbsecca1 has been created"
@@ -11,3 +11,4 @@ echo "[INIT] Tables initiated"
 
 # Install python packages
 pip install -r requirements.txt
+echo "[INIT] Python3 requiermetns has been installed"
