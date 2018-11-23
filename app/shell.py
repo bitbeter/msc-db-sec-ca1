@@ -76,46 +76,13 @@ def shell(yes_to_all=False):
                 appSession.close_connections()
                 sys.exit()
         elif command == 'my privacy':
-            # @todo needs to implement by query
             print('Your Privacy')
         elif command == 'create-user':
-            user_culomns = []
-            username = None
-            id = None
-            type_of_user = None
-            for input in ["username", "password", "type", "absolute_security_level", "read_security_level", "write_security_level", "absolute_integrity_level", "read_integrity_level", "write_integrity_level"]:
-                answer = promptSession.prompt(input + ': ')
-                user_culomns.append(answer)
-                if input == "type":
-                    type_of_user = answer
-                if input == "username":
-                    username = answer
-            appSession.create_user(user_culomns)
-            if type_of_user == "doctor":
-                culomns = []
-                for input in ["firstname", "lastname", "national_code", "sexual", "birthday", "maried", "section", "employee_id", "employment_date", "salary", "major", "username"]:
-                    culomns.append(promptSession.prompt(input + ': '))
-                id = appSession.create_user(culomns)
-            elif type_of_user == "nurse":
-                culomns = []
-                for input in ["firstname", "lastname", "national_code", "sexual", "birthday", "maried", "section", "employee_id", "employment_date", "salary", "username"]:
-                    culomns.append(promptSession.prompt(input + ': '))
-                id = appSession.create_user(culomns)
-            elif type_of_user == "employee":
-                culomns = []
-                for input in ["firstname", "lastname", "national_code", "sexual", "birthday", "maried", "section", "employee_id", "employment_date", "salary", "carrer", "username"]:
-                    culomns.append(promptSession.prompt(input + ': '))
-                id = appSession.create_user(culomns)
-            elif type_of_user == "patient":
-                culomns = []
-                for input in ["firstname", "lastname", "national_code", "sexual", "birthday", "maried", "section", "patient_type", "drugs", "username", "doctor_username", "nurse_username"]:
-                    culomns.append(promptSession.prompt(input + ': '))
-                id = appSession.create_user(culomns)
-            appSession.assign_user_relation_id(id, username)
+            pass
         elif command == 'update-access':
-            print('Your Privacy')
+            pass
         elif command == 'remove-user':
-            print('Your Privacy')
+            pass
         else:
             colnames, result = appSession.query(command)
             result.insert(0, colnames)
