@@ -1,2 +1,4 @@
 prompt_toolkit
 psycopg2-binary
+pygments
+terminaltables

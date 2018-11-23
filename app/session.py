@@ -1,13 +1,10 @@
 import logging
 import psycopg2
 from app.utils import config
+from app.sql_commands import SQL_COMMANDS
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
-
-SQL_COMMANDS = {
-    "login": """SELECT * FROM person WHERE username=%s AND password=%s""",  # Username and Password checking
-}
 
 
 def connect():
@@ -44,17 +41,18 @@ def connect():
 class Session():
     def __init__(self, username, passwrod):
         self.connection = connect()
+        self.cursor = self.connection.cursor()
         self.username = username
         self.passwrod = passwrod
         self.__login__()
 
-    # @todo Mazaheri
-    # @todo prevent from sql injection
-    def query(self, query):
-        """ Run query on database and return values. We assume we have valid query """
+    def __query__(self, sql, params):
         cur = self.connection.cursor()
-        cur.execute(query)
-        pass
+        cur.execute(sql, params)
+        # result = [list(row) for row in cur.fetchall()]
+        # colnames = [desc[0] for desc in cur.description]
+        # cur.close()
+        # return colnames, result
 
     def __login__(self):
         # Check username and password
@@ -62,8 +60,56 @@ class Session():
         # @todo prevent from sql injection
         cur.execute(SQL_COMMANDS["login"], (self.username, self.passwrod))
         row = cur.fetchone()
+        cur.close()
         if (row is not None) and (row[0] == self.username and row[1] == self.passwrod):
             logger.info("User %s sign in into app successfully" %
                         self.username)
         else:
             raise ValueError("Your username or password not correct")
+
+    # @todo Mazaheri
+    # @todo prevent from sql injection
+    def query(self, query, params=None):
+        """ Run query on database and return values. We assume we have valid query """
+        cur = self.connection.cursor()
+        cur.execute(query, params)
+        result = [list(row) for row in cur.fetchall()]
+        colnames = [desc[0] for desc in cur.description]
+        cur.close()
+        return colnames, result
+
+    def create_user(self, params):
+        self.__query__(SQL_COMMANDS["create-user"], params)
+
+    def create_doctor(self, params):
+        self.__query__(SQL_COMMANDS["create-doctor"], params)
+        id = self.cursor.fetchone()
+        return id
+
+    def create_nurse(self, params):
+        self.__query__(SQL_COMMANDS["create-nurse"], params)
+        id = self.cursor.fetchone()
+        return id
+
+    def create_patient(self, params):
+        self.__query__(SQL_COMMANDS["create-patient"], params)
+        id = self.cursor.fetchone()
+        return id
+
+    def create_employee(self, params):
+        self.__query__(SQL_COMMANDS["create-employee"], params)
+        id = self.cursor.fetchone()
+        return id
+
+    def update_user_access(self):
+        pass
+
+    def assign_user_relation_id(self, id, username):
+        self.__query__(SQL_COMMANDS["assign-user-relation-id"], (id, username))
+
+    def delete_user(self):
+        pass
+
+    def close_connections(self):
+        self.connection.close()
+        self.cursor.close()
