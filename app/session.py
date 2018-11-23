@@ -50,10 +50,10 @@ class Session():
 
     # @todo Mazaheri
     # @todo prevent from sql injection
-    def query(self, query, param):
-        """ Run query on database and return valus. We assume we have valid query """
-        # cur = self.connection.cursor()
-        # cur.execute(query, param)
+    def query(self, query):
+        """ Run query on database and return values. We assume we have valid query """
+        cur = self.connection.cursor()
+        cur.execute(query)
         pass
 
     def __login__(self):
