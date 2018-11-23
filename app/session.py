@@ -2,11 +2,11 @@ import logging
 import psycopg2
 from app.utils import config
 
-logger = logging.getLogger('session')
+logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
 
 SQL_COMMANDS = {
-    "login": """SELECT * FROM auth WHERE username=%s AND password=%s""",  # Username and Password checking
+    "login": """SELECT * FROM person WHERE username=%s AND password=%s""",  # Username and Password checking
 }
 
 
@@ -46,22 +46,24 @@ class Session():
         self.connection = connect()
         self.username = username
         self.passwrod = passwrod
-
-        # Check username and password
-        cur = self.connection.cursor()
-        # @todo prevent from sql injection
-        cur.execute(SQL_COMMANDS["login"], (username, passwrod))
-        row = cur.fetchone()
-        if (row is not None) and (row[0] == username and row[1] == passwrod):
-            logger.info("User %s sign in into app successfully" %
-                        self.username)
-        else:
-            raise ValueError("Your username or password not correct")
+        self.__login__()
 
     # @todo Mazaheri
     # @todo prevent from sql injection
     def query(self, query, param):
-        """ Run query on databse and return valus. We assume we have valid query """
+        """ Run query on database and return valus. We assume we have valid query """
         # cur = self.connection.cursor()
         # cur.execute(query, param)
         pass
+
+    def __login__(self):
+        # Check username and password
+        cur = self.connection.cursor()
+        # @todo prevent from sql injection
+        cur.execute(SQL_COMMANDS["login"], (self.username, self.passwrod))
+        row = cur.fetchone()
+        if (row is not None) and (row[0] == self.username and row[1] == self.passwrod):
+            logger.info("User %s sign in into app successfully" %
+                        self.username)
+        else:
+            raise ValueError("Your username or password not correct")
