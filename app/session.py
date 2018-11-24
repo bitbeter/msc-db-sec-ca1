@@ -107,8 +107,8 @@ class Session():
     def assign_user_relation_id(self, id, username):
         self.__query__(SQL_COMMANDS["assign-user-relation-id"], (id, username))
 
-    def delete_user(self):
-        pass
+    def delete_user(self, username):
+        self.__query__(SQL_COMMANDS["delete-user"], (username))
 
     def close_connections(self):
         self.connection.close()

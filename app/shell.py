@@ -1,6 +1,7 @@
 import sys
 import getpass
 from app.session import Session
+from app.sql_parser import SQLParser
 from app.utils import Color
 from prompt_toolkit import prompt
 from prompt_toolkit import PromptSession
@@ -20,7 +21,8 @@ HELP_MESSAGE = """{0}Avalibale Commands:
 SHELL_COMPLETER = WordCompleter(
     words=[
         # Commands
-        'exit', 'MY PRIVACY', 'CREATE-USER', 'UPDATE-ACCESS', 'REMOVE-USER',
+        'EXIT', 'MY PRIVACY', 
+        'CREATE USER', 'UPDATE ACCESS', 'DELETE USER',
         # Query Keywords
         'SELECT', 'INSERT INTO',
         'WHERE',  'UPDATE', 'FROM', 'SET', 'VALUES',
@@ -48,23 +50,23 @@ def login():
     """
     Get username and password from user and return session object
     """
-    username = prompt('Username: ')
-    password = prompt('Password: ', is_password=True)
-    return Session(username, password)
+    # username = prompt('Username: ')
+    # password = prompt('Password: ', is_password=True)
+    # return Session(username, password)
+    return Session('admin', 'admin')
 
 
 def shell(yes_to_all=False):
     promptSession = PromptSession(
         lexer=PygmentsLexer(SqlLexer), auto_suggest=AutoSuggestFromHistory()
     )
-    appSession = Session('admin', 'admin')
-    # appSession = None
-    # while (True):
-    #     try:
-    #         appSession = login()
-    #         break
-    #     except ValueError as error:
-    #         print(error)
+    appSession = None
+    while (True):
+        try:
+            appSession = login()
+            break
+        except ValueError as error:
+            print(error)
     while (True):
         command = promptSession.prompt(
             '> ', completer=SHELL_COMPLETER
@@ -81,10 +83,14 @@ def shell(yes_to_all=False):
             pass
         elif command == 'update-access':
             pass
-        elif command == 'remove-user':
-            pass
+        elif command == 'delete-user':
+            username = promptSession.prompt('Username: ').lower()
+            appSession.delete_user(username)
         else:
-            colnames, result = appSession.query(command)
-            result.insert(0, colnames)
-            table = AsciiTable(result)
-            print(table.table)
+            sql = "select username from person  as t2 left join t3 where a > 20"
+            print(SQLParser.parse_sql_columns(sql))
+            print(SQLParser.parse_sql_tables(sql))
+            # colnames, result = appSession.query(command)
+            # result.insert(0, colnames)
+            # table = AsciiTable(result)
+            # print(table.table)
