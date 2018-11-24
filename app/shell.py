@@ -62,10 +62,13 @@ def shell(yes_to_all=False):
         except ValueError as error:
             print(error)
     tables, culomns = appSession.schema()
+    fields = {}
     for i in range(len(tables)):
+        fields[tables[i]] = culomns[i]
         WORDS.append(tables[i])
         WORDS = WORDS + culomns[i]
-        singleTable = SingleTable([culomns[i][x:x+5] for x in range(0, len(culomns[i]), 5)], title=tables[i])
+        singleTable = SingleTable(
+            [culomns[i][x:x+5] for x in range(0, len(culomns[i]), 5)], title=tables[i])
         singleTable.inner_row_border = True
         print(singleTable.table)
     WORDS = list(set(WORDS))
@@ -83,25 +86,49 @@ def shell(yes_to_all=False):
         elif command == 'my privacy':
             print('Your Privacy')
         elif command == 'create user':
-            pass
+            p = fields["person"].copy()
+            p.remove('id')
+            i = []
+            t = None
+            username = None
+            for input in p:
+                ans = promptSession.prompt(input + " : ")
+                while ans is None or ans == "":
+                    ans = promptSession.prompt(input + " : ")
+                if input == 'type':
+                    t = ans
+                if input == 'username':
+                    username = ans
+                i.append(ans)
+            appSession.create_user(p, i)
+            obj_items = fields[t].copy()
+            obj_items.remove('id')
+            obj_items.remove('username')
+            i = []
+            for input in obj_items:
+                i.append(promptSession.prompt(input + " : "))
+            obj_items.append('username')
+            i.append(username)
+            id = appSession.create_obj(t, obj_items, i)
+            appSession.assign_user_relation_id(id, username)
         elif command == 'update access':
             pass
         elif command == 'delete user':
             username = promptSession.prompt('Username: ').lower()
             appSession.delete_user(username)
         else:
-            sql = "select * from person"
-            sql = "select sum() from doctor"
+            # sql = "select * from person"
+            # sql = "select sum() from doctor"
             # sql = "delete from person where username='hasan' and password='jasem'"
             # sql = "update person set username='hasan' where a > 20"
-            sql = "insert into person (username, password) VALUES (1, 0), (2,0);"
-            sql = "insert into person(username, password) VALUES (1, 0);"
-            print(sql)
+            # sql = "insert into person (username, password) VALUES (1, 0), (2,0);"
+            # sql = "insert into person(username, password) VALUES (1, 0);"
+            # print(sql)
             # print(SQLParser.parse_sql_columns(sql))
             # print(SQLParser.parse_sql_tables(sql))
 
-            SQLParser.parse(sql)
-            # colnames, result = appSession.query(command)
-            # result.insert(0, colnames)
-            # table = SingleTable(result)
-            # print(table.table)
+            # SQLParser.parse(sql)
+            colnames, result = appSession.query(command)
+            result.insert(0, colnames)
+            table = SingleTable(result)
+            print(table.table)
