@@ -78,6 +78,18 @@ class Session():
         cur.close()
         return colnames, result
 
+    def schema(self):
+        self.cursor.execute("""SELECT table_name FROM information_schema.tables
+            WHERE table_schema = 'public'""")
+        tables = [x[0] for x in self.cursor.fetchall()]
+        columns = []
+        for table in tables:
+            # schema.append()
+            self.cursor.execute(
+                """ select column_name from information_schema.columns where table_name = '%s' """ % (table))
+            columns.append([x[0] for x in self.cursor.fetchall()])
+        return tables, columns
+
     def create_user(self, params):
         self.__query__(SQL_COMMANDS["create-user"], params)
 

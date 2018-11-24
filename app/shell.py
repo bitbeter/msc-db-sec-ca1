@@ -2,6 +2,7 @@ import sys
 import getpass
 from app.session import Session
 from app.sql_parser import SQLParser
+from app.sql_commands import SQL_COMMANDS
 from app.utils import Color
 from prompt_toolkit import prompt
 from prompt_toolkit import PromptSession
@@ -10,7 +11,7 @@ from prompt_toolkit.shortcuts import yes_no_dialog
 from pygments.lexers.sql import SqlLexer
 from prompt_toolkit.completion import WordCompleter
 from prompt_toolkit.lexers import PygmentsLexer
-from terminaltables import AsciiTable
+from terminaltables import SingleTable
 
 HELP_MESSAGE = """{0}Avalibale Commands:
 {1}exit          {3}Exit the app
@@ -18,23 +19,15 @@ HELP_MESSAGE = """{0}Avalibale Commands:
 {1}my privacy    {3}Show all other users access to my information {2}check it now{3}""".format(Color.CYAN, Color.BLUE, Color.REVERSE, Color.RESET)
 
 
-SHELL_COMPLETER = WordCompleter(
-    words=[
-        # Commands
-        'EXIT', 'MY PRIVACY', 
-        'CREATE USER', 'UPDATE ACCESS', 'DELETE USER',
-        # Query Keywords
-        'SELECT', 'INSERT INTO',
-        'WHERE',  'UPDATE', 'FROM', 'SET', 'VALUES',
-        'AND', 'OR', 'NOT',
-        # Tables name
-        'doctor', 'nurse', 'employee', 'patient',
-        # Columns
-        'username', 'password', "firstname", "lastname", "national_code", "sexual", "birthday", 
-        "maried", "section", "employee_id", "employment_date", "salary", "major", "carrer",
-        "doctor_username", "nurse_username"
-    ],
-    ignore_case=True)
+WORDS = [
+    # Commands
+    'EXIT', 'MY PRIVACY',
+    'CREATE USER', 'UPDATE ACCESS', 'DELETE USER',
+    # Query Keywords
+    'SELECT', 'INSERT INTO',
+    'WHERE',  'UPDATE', 'FROM', 'SET', 'VALUES',
+    'AND', 'OR', 'NOT',
+]
 
 
 def do_you_sure(yse_to_all):
@@ -57,6 +50,7 @@ def login():
 
 
 def shell(yes_to_all=False):
+    global WORDS
     promptSession = PromptSession(
         lexer=PygmentsLexer(SqlLexer), auto_suggest=AutoSuggestFromHistory()
     )
@@ -67,10 +61,19 @@ def shell(yes_to_all=False):
             break
         except ValueError as error:
             print(error)
+    tables, culomns = appSession.schema()
+    for i in range(len(tables)):
+        WORDS.append(tables[i])
+        WORDS = WORDS + culomns[i]
+        singleTable = SingleTable([culomns[i][x:x+5] for x in range(0, len(culomns[i]), 5)], title=tables[i])
+        singleTable.inner_row_border = True
+        print(singleTable.table)
+    WORDS = list(set(WORDS))
+    WORDS.sort()
+
     while (True):
         command = promptSession.prompt(
-            '> ', completer=SHELL_COMPLETER
-        ).lower()
+            '> ', completer=WordCompleter(WORDS, ignore_case=True)).lower()
         if command == '-h':
             print(HELP_MESSAGE)
         elif command == 'exit':
@@ -87,10 +90,17 @@ def shell(yes_to_all=False):
             username = promptSession.prompt('Username: ').lower()
             appSession.delete_user(username)
         else:
-            sql = "select username from person  as t2 left join t3 where a > 20"
-            print(SQLParser.parse_sql_columns(sql))
-            print(SQLParser.parse_sql_tables(sql))
+            # sql = "select * from person where a > 20"
+            # sql = "delete from person where username='hasan' and password='jasem'"
+            # sql = "update person set username='hasan' where a > 20"
+            sql = "insert into person (username, password) VALUES (1, 0), (2,0);"
+            sql = "insert into person(username, password) VALUES (1, 0);"
+            print(sql)
+            # print(SQLParser.parse_sql_columns(sql))
+            # print(SQLParser.parse_sql_tables(sql))
+
+            SQLParser.parse(sql)
             # colnames, result = appSession.query(command)
             # result.insert(0, colnames)
-            # table = AsciiTable(result)
+            # table = SingleTable(result)
             # print(table.table)
