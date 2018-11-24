@@ -82,15 +82,16 @@ def shell(yes_to_all=False):
                 sys.exit()
         elif command == 'my privacy':
             print('Your Privacy')
-        elif command == 'create-user':
+        elif command == 'create user':
             pass
-        elif command == 'update-access':
+        elif command == 'update access':
             pass
-        elif command == 'delete-user':
+        elif command == 'delete user':
             username = promptSession.prompt('Username: ').lower()
             appSession.delete_user(username)
         else:
-            # sql = "select * from person where a > 20"
+            sql = "select * from person"
+            sql = "select sum() from doctor"
             # sql = "delete from person where username='hasan' and password='jasem'"
             # sql = "update person set username='hasan' where a > 20"
             sql = "insert into person (username, password) VALUES (1, 0), (2,0);"

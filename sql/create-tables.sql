@@ -89,6 +89,6 @@ create table patient
     drugs text,
     -- Forigen Keys
     username text references person(username) on update cascade on delete cascade,
-    doctor_username text references person(username),
-    nurse_username text references person(username)
+    doctor_username text references person(username) on update cascade on delete set null,
+    nurse_username text references person(username) on update cascade on delete set null
 );

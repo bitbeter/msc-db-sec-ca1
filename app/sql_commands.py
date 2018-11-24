@@ -56,16 +56,4 @@ SQL_COMMANDS = {
     WHERE username = %s;
     """,
     
-    "assign-user-relation-id":
-    """
-    UPDATE "person"
-    SET id = %s 
-    WHERE username = %s;
-    """,
-
-    "delete-user":
-    """
-    DELETE FROM "person"
-    WHERE username = %s;
-    """
 }

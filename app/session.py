@@ -84,10 +84,25 @@ class Session():
         tables = [x[0] for x in self.cursor.fetchall()]
         columns = []
         for table in tables:
+            self.cursor.execute("""
+            SELECT pg_attribute.attname 
+            FROM 
+                pg_index, pg_class, pg_attribute, pg_namespace 
+            WHERE 
+                pg_class.oid = '%s'::regclass AND 
+                indrelid = pg_class.oid AND 
+                nspname = 'public' AND 
+                pg_class.relnamespace = pg_namespace.oid AND 
+                pg_attribute.attrelid = pg_class.oid AND 
+                pg_attribute.attnum = any(pg_index.indkey) AND 
+                indisprimary
+            """ % (table))
+            key = self.cursor.fetchone()[0]
             # schema.append()
             self.cursor.execute(
                 """ select column_name from information_schema.columns where table_name = '%s' """ % (table))
-            columns.append([x[0] for x in self.cursor.fetchall()])
+            columns.append([x[0].replace(key, key + " - Primary Key") if x[0] == key else x[0]
+                            for x in self.cursor.fetchall()])
         return tables, columns
 
     def create_user(self, params):
@@ -117,10 +132,12 @@ class Session():
         pass
 
     def assign_user_relation_id(self, id, username):
-        self.__query__(SQL_COMMANDS["assign-user-relation-id"], (id, username))
+        self.__query__(
+            """ UPDATE "person" SET id = %s WHERE username = %s; """, (id, username))
 
     def delete_user(self, username):
-        self.__query__(SQL_COMMANDS["delete-user"], (username))
+        self.__query__(
+            """ DELETE FROM "person" WHERE username = %s; """, (username, ))
 
     def close_connections(self):
         self.connection.close()
