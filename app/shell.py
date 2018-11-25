@@ -19,6 +19,8 @@ HELP_MESSAGE = """{0}Avalibale Commands:
 {1}my privacy    {3}Show all other users access to my information {2}check it now{3}""".format(Color.CYAN, Color.BLUE, Color.REVERSE, Color.RESET)
 
 
+condition = """ person.read_security_level >= %s AND person.write_security_level <= %s AND person.read_integrity_level <= %s AND person.write_integrity_level >= %s """
+
 WORDS = [
     # Commands
     'EXIT', 'MY PRIVACY',
@@ -43,14 +45,14 @@ def login():
     """
     Get username and password from user and return session object
     """
-    username = prompt('Username: ')
-    password = prompt('Password: ', is_password=True)
-    return Session(username, password)
-    # return Session('admin', 'admin')
+    # username = prompt('Username: ')
+    # password = prompt('Password: ', is_password=True)
+    # return Session(username, password)
+    return Session('doctor', 'doctor')
 
 
 def shell(yes_to_all=False):
-    global WORDS
+    global WORDS, condition
     promptSession = PromptSession(
         lexer=PygmentsLexer(SqlLexer), auto_suggest=AutoSuggestFromHistory()
     )
@@ -86,6 +88,9 @@ def shell(yes_to_all=False):
         elif command == 'my privacy':
             print('Your Privacy')
         elif command == 'create user':
+            if not appSession.isAdmin():
+                print("You have no access to this command")
+                continue
             p = fields["person"].copy()
             p.remove('id')
             i = []
@@ -112,21 +117,44 @@ def shell(yes_to_all=False):
             id = appSession.create_obj(t, obj_items, i)
             appSession.assign_user_relation_id(id, username)
         elif command == 'delete user':
+            if not appSession.isAdmin():
+                print("You have no access to this command")
             username = promptSession.prompt('Username: ').lower()
             appSession.delete_user(username)
         else:
-            # sql = "select * from person"
-            # sql = "select sum() from doctor"
-            # sql = "delete from person where username='hasan' and password='jasem'"
-            # sql = "update person set username='hasan' where a > 20"
-            # sql = "insert into person (username, password) VALUES (1, 0), (2,0);"
-            # sql = "insert into person(username, password) VALUES (1, 0);"
-            # print(sql)
-            # print(SQLParser.parse_sql_columns(sql))
-            # print(SQLParser.parse_sql_tables(sql))
-
-            # SQLParser.parse(sql)
-            colnames, result = appSession.query(command)
-            result.insert(0, colnames)
-            table = SingleTable(result)
-            print(table.table)
+            command = command.replace(";", "")
+            command = " ".join(command.lower().split())
+            if ("insert" in command or "person" in command) and not appSession.isAdmin():
+                print("You have no access to this query")
+                continue
+            if "insert" not in command and not appSession.isAdmin():
+                print ("HHHHHHHHHHHHHHHHEEEEEEEEEEEEEEY")
+                command = command.replace(
+                    "from doctor", "from doctor left join person on person.username = doctor.username")
+                command = command.replace("from employee",
+                                "from employee left join person on person.username = employee.username")
+                command = command.replace(
+                    "from nurse", "from nurse left join person on person.username = nurse.username")
+                command = command.replace(
+                    "from patient", "from patient left join person on person.username = patient.username")
+                if "where" in command:
+                    # Add condirion
+                    command = command + " AND " + \
+                        condition % tuple(appSession.accesses())
+                else:
+                    command = command + " WHERE " + \
+                        condition % tuple(appSession.accesses())
+                if "from patient" in command:
+                    if appSession.type == "doctor":
+                        command = command + " AND patient.doctor_username = '%s'" % appSession.username
+                    elif appSession.type == "nurse":
+                        command = command + " AND patient.nurse_username = '%s'" % appSession.username
+            try:
+                print(command)
+                colnames, result = appSession.query(command)
+                result.insert(0, colnames)
+                table = SingleTable(result)
+                print(table.table)
+            except Exception as e:
+                appSession.connection.rollback()
+                print(e)

@@ -60,8 +60,19 @@ class Session():
         if (row is not None) and (row[0] == self.username and row[1] == self.passwrod):
             logger.info("User %s sign in into app successfully" %
                         self.username)
+            self.type = row[2]
+            self.read_security_level = row[5]
+            self.write_security_level = row[6]
+            self.read_integrity_level = row[8]
+            self.write_integrity_level = row[9]
         else:
             raise ValueError("Your username or password not correct")
+
+    def isAdmin(self):
+        return self.username == "admin"
+
+    def accesses(self):
+        return [self.read_security_level ,self.write_security_level, self.read_integrity_level, self.write_integrity_level]
 
     def query(self, query, params=None):
         """ Run query on database and return values. We assume we have valid query """

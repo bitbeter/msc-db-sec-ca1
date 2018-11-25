@@ -92,3 +92,12 @@ create table patient
     doctor_username text references person(username) on update cascade on delete set null,
     nurse_username text references person(username) on update cascade on delete set null
 );
+
+
+CREATE FUNCTION doctor_access ( @top_read int, @down_read int)
+RETURNS table
+AS
+RETURN (
+        SELECT *
+FROM doctor LEFT JOIN person ON doctor.username = person.username
+WHERE person.read_security_level = @top_read AND person.read_integrity_level = @down_read);
