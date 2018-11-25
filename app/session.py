@@ -71,9 +71,6 @@ class Session():
     def isAdmin(self):
         return self.username == "admin"
 
-    def accesses(self):
-        return [self.read_security_level ,self.write_security_level, self.read_integrity_level, self.write_integrity_level]
-
     def query(self, query, params=None):
         """ Run query on database and return values. We assume we have valid query """
         cur = self.connection.cursor()

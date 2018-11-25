@@ -19,8 +19,6 @@ HELP_MESSAGE = """{0}Avalibale Commands:
 {1}my privacy    {3}Show all other users access to my information {2}check it now{3}""".format(Color.CYAN, Color.BLUE, Color.REVERSE, Color.RESET)
 
 
-condition = """ person.read_security_level >= %s AND person.write_security_level <= %s AND person.read_integrity_level <= %s AND person.write_integrity_level >= %s """
-
 WORDS = [
     # Commands
     'EXIT', 'MY PRIVACY',
@@ -124,31 +122,62 @@ def shell(yes_to_all=False):
         else:
             command = command.replace(";", "")
             command = " ".join(command.lower().split())
-            if ("insert" in command or "person" in command) and not appSession.isAdmin():
+            if ("insert" in command or "person" in command or "delete" in command) and not appSession.isAdmin():
                 print("You have no access to this query")
                 continue
-            if "insert" not in command and not appSession.isAdmin():
-                print ("HHHHHHHHHHHHHHHHEEEEEEEEEEEEEEY")
+            if "select" in command and not appSession.isAdmin():
                 command = command.replace(
                     "from doctor", "from doctor left join person on person.username = doctor.username")
                 command = command.replace("from employee",
-                                "from employee left join person on person.username = employee.username")
+                                          "from employee left join person on person.username = employee.username")
                 command = command.replace(
                     "from nurse", "from nurse left join person on person.username = nurse.username")
                 command = command.replace(
                     "from patient", "from patient left join person on person.username = patient.username")
                 if "where" in command:
-                    # Add condirion
                     command = command + " AND " + \
-                        condition % tuple(appSession.accesses())
+                        """ person.read_security_level >= %s AND person.read_integrity_level <= %s """ % (
+                            appSession.read_security_level, appSession.read_integrity_level)
                 else:
                     command = command + " WHERE " + \
-                        condition % tuple(appSession.accesses())
+                        """ person.read_security_level >= %s AND person.read_integrity_level <= %s """ % (
+                            appSession.read_security_level, appSession.read_integrity_level)
                 if "from patient" in command:
                     if appSession.type == "doctor":
                         command = command + " AND patient.doctor_username = '%s'" % appSession.username
                     elif appSession.type == "nurse":
                         command = command + " AND patient.nurse_username = '%s'" % appSession.username
+
+            if "update" in command and not appSession.isAdmin():
+                if "where" in command:
+                    command = command + " AND " + \
+                        """ exists (select * from person where person.username = username AND person.write_security_level <= %s AND person.write_integrity_level >= %s) """ % (
+                            appSession.write_security_level, appSession.write_integrity_level)
+                else:
+                    command = command + " WHERE " + \
+                        """ exists (select * from person where person.username = username AND person.write_security_level <= %s AND person.write_integrity_level >= %s) """ % (
+                            appSession.write_security_level, appSession.read_integrity_level)
+                if "patient" in command:
+                    if appSession.type == "doctor":
+                        command = command + " AND patient.doctor_username = '%s'" % appSession.username
+                    elif appSession.type == "nurse":
+                        command = command + " AND patient.nurse_username = '%s'" % appSession.username
+
+            if "update" in command and not appSession.isAdmin():
+                if "where" in command:
+                    command = command + " AND " + \
+                        """ exists (select * from person where person.username = username AND person.write_security_level <= %s AND person.write_integrity_level >= %s) """ % (
+                            appSession.write_security_level, appSession.write_integrity_level)
+                else:
+                    command = command + " WHERE " + \
+                        """ exists (select * from person where person.username = username AND person.write_security_level <= %s AND person.write_integrity_level >= %s) """ % (
+                            appSession.write_security_level, appSession.read_integrity_level)
+                if "patient" in command:
+                    if appSession.type == "doctor":
+                        command = command + " AND patient.doctor_username = '%s'" % appSession.username
+                    elif appSession.type == "nurse":
+                        command = command + " AND patient.nurse_username = '%s'" % appSession.username
+
             try:
                 print(command)
                 colnames, result = appSession.query(command)
