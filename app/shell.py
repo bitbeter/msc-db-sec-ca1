@@ -22,7 +22,7 @@ HELP_MESSAGE = """{0}Avalibale Commands:
 WORDS = [
     # Commands
     'EXIT', 'MY PRIVACY',
-    'CREATE USER', 'UPDATE ACCESS', 'DELETE USER',
+    'CREATE USER', 'DELETE USER',
     # Query Keywords
     'SELECT', 'INSERT INTO',
     'WHERE',  'UPDATE', 'FROM', 'SET', 'VALUES',
@@ -43,10 +43,10 @@ def login():
     """
     Get username and password from user and return session object
     """
-    # username = prompt('Username: ')
-    # password = prompt('Password: ', is_password=True)
-    # return Session(username, password)
-    return Session('admin', 'admin')
+    username = prompt('Username: ')
+    password = prompt('Password: ', is_password=True)
+    return Session(username, password)
+    # return Session('admin', 'admin')
 
 
 def shell(yes_to_all=False):
@@ -111,8 +111,6 @@ def shell(yes_to_all=False):
             i.append(username)
             id = appSession.create_obj(t, obj_items, i)
             appSession.assign_user_relation_id(id, username)
-        elif command == 'update access':
-            pass
         elif command == 'delete user':
             username = promptSession.prompt('Username: ').lower()
             appSession.delete_user(username)

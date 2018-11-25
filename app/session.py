@@ -95,7 +95,12 @@ class Session():
         id = self.cursor.fetchone()[0]
         return id
 
-    def update_user_access(self):
+    def update_user_access(self, username, params):
+        self.__query__(
+            """ UPDATE "person" SET 
+            absolute_security_level = %s ,read_security_level = %s ,write_security_level = %s ,
+            absolute_integrity_level = %s ,read_integrity_level = %s ,write_integrity_level = %s  
+            WHERE username = %s; """, (username, params))
         pass
 
     def assign_user_relation_id(self, id, username):
