@@ -43,10 +43,9 @@ def login():
     """
     Get username and password from user and return session object
     """
-    # username = prompt('Username: ')
-    # password = prompt('Password: ', is_password=True)
-    # return Session(username, password)
-    return Session('doctor', 'doctor')
+    username = prompt('Username: ')
+    password = prompt('Password: ', is_password=True)
+    return Session(username, password)
 
 
 def shell(yes_to_all=False):
