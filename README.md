@@ -6,5 +6,3 @@ You need first initiate database and its tables and some other stuff. For initia
 
 After that you can run project with `python3 main.py` .
 > For more help run `python3 main.py -h` .
-
-test
